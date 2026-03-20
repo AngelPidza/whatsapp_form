@@ -60,6 +60,28 @@ namespace whatsapp
         private readonly Color WA_SubText = Color.FromArgb(134, 150, 160);
         private readonly Color WA_Tick = Color.FromArgb(83, 175, 236);
 
+        public static string GetWifiIP()
+        {
+            foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 &&
+                    ni.OperationalStatus == OperationalStatus.Up)
+                {
+                    var ipProps = ni.GetIPProperties();
+
+                    foreach (var addr in ipProps.UnicastAddresses)
+                    {
+                        if (addr.Address.AddressFamily == AddressFamily.InterNetwork)
+                        {
+                            return addr.Address.ToString();
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public Form1()
         {
             this.Text = "WhatsApp";
@@ -73,7 +95,7 @@ namespace whatsapp
             // App Icon color bar at top (Windows title area trick)
             this.Icon = CreateAppIcon();
 
-            _myIP = GetLocalIP();
+            _myIP = GetWifiIP();
 
             BuildUI();
             StartListening();
